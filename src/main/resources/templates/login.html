@@ -1,0 +1,81 @@
+<!doctype html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>登录</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.12.0/theme-chalk/index.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
+    <script src="https://cdn.bootcss.com/element-ui/2.12.0/index.js"></script>
+    <script src="https://cdn.bootcss.com/axios/0.19.0-beta.1/axios.min.js"></script>
+</head>
+<body>
+    <div id="login">
+        <el-row :gutter="20">
+            <el-col :span="5" :offset="1">
+                <el-form :model="user" ref="loginForm" label-width="120px" :rules="rules">
+                    <el-form-item prop="username" label="用户名">
+                        <el-input v-model="user.username" placeholder="用户名"></el-input>
+                    </el-form-item>
+
+                    <el-form-item prop="password" label="密码">
+                        <el-input v-model="user.password" placeholder="密码" show-password></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" v-on:click="login">登录</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
+    </div>
+    <script th:inline="javascript">
+        new Vue({
+            el:'#login',
+            data:function(){
+                return {
+                    user:{
+                        username:'',
+                        password:''
+                    },
+                    rules:{
+                        username:[
+                            {required:true,message:'请输入用户名',trigger:'blur'}
+                        ],
+                        password:[
+                            {required:true,message:'请输入密码',trigger:'blur'}
+                        ]
+                    }
+                }
+            },
+            methods:{
+                login:function(){
+                    var vm = this;
+                    vm.$refs.loginForm.validate(function(valid){
+                        if(valid){
+                            vm.submitData();
+                        }
+                    });
+                },
+                submitData:function(){
+                    var vm = this;
+                    var formData = new FormData();
+                    for(var item in vm.user){
+                        formData.append(item,vm.user[item]);
+                    }
+                    axios.post('/login',formData).then(function (res) {
+                        var result = res.data;
+                        if(result.code == 200){
+                            location.href = '/';
+                        }else{
+                            vm.$alert(result.msg);
+                        }
+                    });
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
